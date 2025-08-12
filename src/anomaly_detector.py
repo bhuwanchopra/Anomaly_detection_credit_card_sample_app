@@ -54,18 +54,40 @@ class AnomalyDetector:
         if not pd.api.types.is_datetime64_any_dtype(features_df['transaction_date']):
             features_df['transaction_date'] = pd.to_datetime(features_df['transaction_date'])
         
-        # Extract time-based features
+        # Sort by transaction date for temporal features
+        features_df = features_df.sort_values('transaction_date').reset_index(drop=True)
+        
+        # Extract enhanced time-based features
         features_df['hour'] = features_df['transaction_date'].dt.hour
         features_df['day_of_week'] = features_df['transaction_date'].dt.dayofweek
         features_df['is_weekend'] = features_df['day_of_week'].isin([5, 6]).astype(int)
         features_df['month'] = features_df['transaction_date'].dt.month
         
+        # Enhanced time-based features
+        features_df['is_unusual_hour'] = features_df['hour'].isin([2, 3, 4, 5]).astype(int)
+        features_df['is_business_hour'] = features_df['hour'].between(9, 17).astype(int)
+        features_df['is_late_night'] = features_df['hour'].isin([22, 23, 0, 1]).astype(int)
+        
+        # Add additional time risk indicators to amplify unusual time patterns
+        features_df['time_risk_score'] = (
+            features_df['is_unusual_hour'] * 3 +  # Heavy weight for 2-5 AM
+            features_df['is_late_night'] * 1.5 +  # Moderate weight for late night
+            (1 - features_df['is_business_hour']) * 0.5  # Light weight for non-business hours
+        )
+        
         # Amount-based features
         features_df['amount_log'] = np.log1p(features_df['amount'])
         features_df['amount_rounded'] = (features_df['amount'] % 1 == 0).astype(int)
         
+        # Enhanced amount features
+        features_df['amount_zscore'] = (features_df['amount'] - features_df['amount'].mean()) / features_df['amount'].std()
+        features_df['is_round_amount'] = features_df['amount'].isin([100, 200, 500, 1000, 1500, 2000, 2500, 5000]).astype(int)
+        
         # Card-based features (extract last 4 digits)
         features_df['card_last_4'] = features_df['card_number'].str[-4:].astype(int)
+        
+        # Enhanced temporal features for frequent_transactions detection
+        features_df = self._add_frequency_features(features_df)
         
         # Categorical encoding
         categorical_cols = ['merchant_category', 'city', 'state', 'country']
@@ -79,15 +101,100 @@ class AnomalyDetector:
                 features_df[f'{col}_encoded'] = 0  # Default for unseen categories
                 features_df.loc[mask, f'{col}_encoded'] = self.label_encoders[col].transform(features_df.loc[mask, col])
         
-        # Select numerical features for ML
+        # Select enhanced numerical features for ML
         feature_columns = [
-            'amount', 'amount_log', 'amount_rounded', 'hour', 'day_of_week', 
-            'is_weekend', 'month', 'card_last_4',
+            'amount', 'amount_log', 'amount_rounded', 'amount_zscore', 'is_round_amount',
+            'hour', 'day_of_week', 'is_weekend', 'month', 
+            'is_unusual_hour', 'is_business_hour', 'is_late_night', 'time_risk_score',
+            'card_last_4',
+            'transactions_last_hour', 'transactions_last_day', 'avg_time_between_transactions',
             'merchant_category_encoded', 'city_encoded', 'state_encoded', 'country_encoded'
         ]
         
         self.feature_names = feature_columns
         return features_df[feature_columns]
+    
+    def _add_frequency_features(self, df: pd.DataFrame) -> pd.DataFrame:
+        """
+        Add frequency-based features to detect frequent transactions.
+        
+        Args:
+            df: DataFrame with transaction data (sorted by time)
+            
+        Returns:
+            DataFrame with additional frequency features
+        """
+        # Initialize frequency features
+        df['transactions_last_hour'] = 0
+        df['transactions_last_day'] = 0
+        df['avg_time_between_transactions'] = 24.0  # Default 24 hours
+        
+        # For large datasets, use a more efficient approach
+        if len(df) > 100000:
+            # Simplified frequency features for large datasets
+            # Group by card and calculate basic frequency metrics
+            for card in df['card_number'].unique():
+                card_mask = df['card_number'] == card
+                card_data = df[card_mask].copy()
+                
+                if len(card_data) > 1:
+                    # Calculate time differences in hours
+                    time_diffs = card_data['transaction_date'].diff()
+                    time_diffs_hours = time_diffs.dt.total_seconds() / 3600
+                    avg_hours = time_diffs_hours.mean()
+                    
+                    # Set average time between transactions
+                    df.loc[card_mask, 'avg_time_between_transactions'] = avg_hours
+                    
+                    # Mark transactions that are very close in time (< 1 hour apart)
+                    close_transactions = time_diffs_hours < 1
+                    df.loc[card_data.index[close_transactions], 'transactions_last_hour'] = 1
+                    
+                    # Mark transactions that are part of many in a day
+                    daily_counts = card_data.groupby(card_data['transaction_date'].dt.date).size()
+                    for date, count in daily_counts.items():
+                        if count > 5:  # More than 5 transactions in a day
+                            date_mask = card_data['transaction_date'].dt.date == date
+                            df.loc[card_data.index[date_mask], 'transactions_last_day'] = count
+            
+            return df
+        
+        # More detailed calculation for smaller datasets
+        # Group by card to analyze per-card patterns
+        for card in df['card_number'].unique():
+            card_mask = df['card_number'] == card
+            card_transactions = df[card_mask].copy().reset_index()
+            
+            if len(card_transactions) > 1:
+                # Calculate time differences
+                card_times = pd.to_datetime(card_transactions['transaction_date'])
+                time_diffs = card_times.diff().dt.total_seconds().fillna(3600)
+                
+                # For each transaction, count recent transactions
+                for i in range(len(card_transactions)):
+                    current_time = card_times.iloc[i]
+                    orig_idx = card_transactions.iloc[i]['index']
+                    
+                    # Count transactions in last hour
+                    hour_ago = current_time - pd.Timedelta(hours=1)
+                    recent_hour_count = sum(
+                        (card_times >= hour_ago) & (card_times < current_time)
+                    )
+                    df.loc[orig_idx, 'transactions_last_hour'] = recent_hour_count
+                    
+                    # Count transactions in last day
+                    day_ago = current_time - pd.Timedelta(days=1)
+                    recent_day_count = sum(
+                        (card_times >= day_ago) & (card_times < current_time)
+                    )
+                    df.loc[orig_idx, 'transactions_last_day'] = recent_day_count
+                
+                # Average time between transactions
+                avg_time_diff = time_diffs.mean()
+                orig_indices = card_transactions['index'].values
+                df.loc[orig_indices, 'avg_time_between_transactions'] = avg_time_diff / 3600  # Convert to hours
+        
+        return df
     
     def detect_anomalies_pca(self, features: pd.DataFrame, n_components: int = 2) -> Dict:
         """
@@ -592,8 +699,8 @@ class AnomalyDetector:
                 report.append(f"    {tx['city']}, {tx['state']} | {tx['transaction_date']}")
                 report.append("")
         
-        # Feature importance
-        if 'ensemble' in self.results:
+        # Feature importance (if available)
+        if 'ensemble' in self.results and 'feature_importance' in self.results['ensemble']:
             importance = self.results['ensemble']['feature_importance']
             top_features = sorted(importance.items(), key=lambda x: x[1], reverse=True)[:5]
             

@@ -24,15 +24,79 @@ class AnomalyGenerator:
     def inject_anomalies(self, transactions: List[Dict[str, Any]], anomaly_rate: float) -> List[Dict[str, Any]]:
         """Inject anomalies into a list of transactions."""
         num_anomalies = int(len(transactions) * anomaly_rate)
-        anomaly_indices = random.sample(range(len(transactions)), num_anomalies)
         
-        for idx in anomaly_indices:
-            anomaly_type = random.choice(self.anomaly_types)
-            transactions[idx] = self._apply_anomaly(transactions[idx], anomaly_type)
-            transactions[idx]['is_anomaly'] = True
-            transactions[idx]['anomaly_type'] = anomaly_type
+        # Handle frequent_transactions specially since they need multiple transactions
+        frequent_transactions_count = int(num_anomalies * 0.15)  # 15% of anomalies are frequent patterns
+        regular_anomalies_count = num_anomalies - frequent_transactions_count
+        
+        # Create frequent transaction patterns first
+        if frequent_transactions_count > 0:
+            self._create_frequent_transaction_patterns(transactions, frequent_transactions_count)
+        
+        # Then create regular individual anomalies
+        if regular_anomalies_count > 0:
+            # Exclude frequent_transactions from regular anomaly types
+            regular_anomaly_types = [t for t in self.anomaly_types if t != 'frequent_transactions']
+            
+            # Get indices that aren't already marked as anomalies
+            available_indices = [i for i, t in enumerate(transactions) if not t.get('is_anomaly', False)]
+            
+            if len(available_indices) >= regular_anomalies_count:
+                anomaly_indices = random.sample(available_indices, regular_anomalies_count)
+                
+                for idx in anomaly_indices:
+                    anomaly_type = random.choice(regular_anomaly_types)
+                    transactions[idx] = self._apply_anomaly(transactions[idx], anomaly_type)
+                    transactions[idx]['is_anomaly'] = True
+                    transactions[idx]['anomaly_type'] = anomaly_type
         
         return transactions
+    
+    def _create_frequent_transaction_patterns(self, transactions: List[Dict[str, Any]], count: int) -> None:
+        """Create patterns of frequent transactions for the same card."""
+        # Group transactions by card
+        card_transactions = {}
+        for i, transaction in enumerate(transactions):
+            card = transaction['card_number']
+            if card not in card_transactions:
+                card_transactions[card] = []
+            card_transactions[card].append((i, transaction))
+        
+        # Find cards with enough transactions to create patterns
+        suitable_cards = [card for card, txns in card_transactions.items() if len(txns) >= 3]
+        
+        patterns_created = 0
+        while patterns_created < count and suitable_cards:
+            card = random.choice(suitable_cards)
+            card_txns = card_transactions[card]
+            
+            # Select 3-5 transactions from this card to make frequent
+            pattern_size = random.randint(3, min(5, len(card_txns)))
+            selected_txns = random.sample(card_txns, pattern_size)
+            
+            # Make these transactions occur within a short time window
+            base_time = selected_txns[0][1]['transaction_date']
+            if isinstance(base_time, str):
+                base_time = datetime.fromisoformat(base_time.replace('Z', '+00:00'))
+            
+            for i, (idx, txn) in enumerate(selected_txns):
+                # Space transactions 10-30 minutes apart
+                time_offset = timedelta(minutes=random.randint(10, 30) * i)
+                new_time = base_time + time_offset
+                
+                transactions[idx]['transaction_date'] = new_time
+                transactions[idx]['is_anomaly'] = True
+                transactions[idx]['anomaly_type'] = 'frequent_transactions'
+                patterns_created += 1
+                
+                if patterns_created >= count:
+                    break
+            
+            # Remove this card from suitable cards to avoid reuse
+            suitable_cards.remove(card)
+            
+            if patterns_created >= count:
+                break
     
     def _apply_anomaly(self, transaction: Dict[str, Any], anomaly_type: str) -> Dict[str, Any]:
         """Apply a specific type of anomaly to a transaction."""

@@ -1,0 +1,73 @@
+============================================================
+ANOMALY DETECTION REPORT
+============================================================
+Analysis Date: 2025-08-11 22:17:43
+Total Transactions: 2000
+
+PCA Results:
+  Anomalies Detected: 100 (5.00%)
+  Precision: 0.620
+  Recall: 0.388
+  F1-Score: 0.477
+  Accuracy: 0.932
+
+Isolation Forest Results:
+  Anomalies Detected: 200 (10.00%)
+  Precision: 0.365
+  Recall: 0.456
+  F1-Score: 0.406
+  Accuracy: 0.893
+
+Local Outlier Factor Results:
+  Anomalies Detected: 200 (10.00%)
+  Precision: 0.425
+  Recall: 0.531
+  F1-Score: 0.472
+  Accuracy: 0.905
+
+Ensemble Results:
+  Anomalies Detected: 147 (7.35%)
+  Precision: 0.571
+  Recall: 0.525
+  F1-Score: 0.547
+  Accuracy: 0.930
+
+TOP 10 MOST ANOMALOUS TRANSACTIONS:
+----------------------------------------
+ 1. Score: 0.939 | $24962.65 | Hilton Hotel (travel)
+    Memphis, TN | 2025-07-16 09:27:18.889030
+
+ 2. Score: 0.771 | $20605.47 | Hotels.com (travel)
+    Tampa, FL | 2025-06-30 14:55:50.889030
+
+ 3. Score: 0.765 | $20741.34 | Enterprise (travel)
+    Columbus, OH | 2025-06-06 14:58:30.889030
+
+ 4. Score: 0.426 | $10225.29 | CVS Pharmacy (healthcare)
+    Chicago, IL | 2025-07-19 16:31:39.889030
+
+ 5. Score: 0.413 | $ 6605.59 | FoodMart (grocery)
+    Philadelphia, PA | 2025-05-25 00:58:58.889030
+
+ 6. Score: 0.412 | $   37.21 | Best Buy (retail)
+    Dubai, Dubai | 2025-08-01 05:26:27.889030
+
+ 7. Score: 0.388 | $ 5000.00 | Airbnb (travel)
+    Tampa, FL | 2025-07-26 13:43:29.889030
+
+ 8. Score: 0.384 | $  145.00 | Amusement Park (entertainment)
+    Beijing, Beijing | 2025-05-24 18:42:59.889030
+
+ 9. Score: 0.384 | $  131.73 | Apple iTunes (online)
+    Dubai, Dubai | 2025-05-21 01:50:30.889030
+
+10. Score: 0.383 | $ 6789.44 | Expedia (travel)
+    Jacksonville, FL | 2025-07-19 03:28:25.889030
+
+TOP 5 IMPORTANT FEATURES:
+------------------------------
+  amount: 1.366
+  country_encoded: 1.293
+  amount_log: 1.045
+  hour: 0.425
+  amount_rounded: 0.324

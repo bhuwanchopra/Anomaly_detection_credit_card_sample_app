@@ -111,6 +111,7 @@ dmypy.json
 data/*.csv
 data/*.json
 data/*.png
+data/*.txt
 
 # Logs
 *.log

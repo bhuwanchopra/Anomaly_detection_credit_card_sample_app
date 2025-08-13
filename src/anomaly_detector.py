@@ -84,7 +84,7 @@ class AnomalyDetector:
         features_df['is_round_amount'] = features_df['amount'].isin([100, 200, 500, 1000, 1500, 2000, 2500, 5000]).astype(int)
         
         # Card-based features (extract last 4 digits)
-        features_df['card_last_4'] = features_df['card_number'].str[-4:].astype(int)
+        features_df['card_last_4'] = features_df['card_number'].astype(str).str[-4:].astype(int)
         
         # Enhanced temporal features for frequent_transactions detection
         features_df = self._add_frequency_features(features_df)
@@ -111,8 +111,11 @@ class AnomalyDetector:
             'merchant_category_encoded', 'city_encoded', 'state_encoded', 'country_encoded'
         ]
         
-        self.feature_names = feature_columns
-        return features_df[feature_columns]
+        # Only include columns that exist
+        available_columns = [col for col in feature_columns if col in features_df.columns]
+        
+        self.feature_names = available_columns
+        return features_df[available_columns]
     
     def _add_frequency_features(self, df: pd.DataFrame) -> pd.DataFrame:
         """
@@ -201,13 +204,13 @@ class AnomalyDetector:
         Detect anomalies using PCA reconstruction error.
         
         Args:
-            features: Prepared feature matrix
+            features: DataFrame with numerical features
             n_components: Number of PCA components
             
         Returns:
-            Dictionary with results
+            Dictionary with anomaly results
         """
-        # Standardize features
+        # Scale features
         features_scaled = self.scaler.fit_transform(features)
         
         # Apply PCA

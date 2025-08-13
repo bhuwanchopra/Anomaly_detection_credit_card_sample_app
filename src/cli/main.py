@@ -112,7 +112,10 @@ def detect(input, output, contamination, visualization, method, export_anomalies
         # Ensure output directory exists
         Path(output).parent.mkdir(parents=True, exist_ok=True)
         
-        # Feature engineering if requested
+        # Initialize detector
+        detector = AnomalyDetector(contamination=contamination)
+        
+        # Feature engineering
         if use_features:
             click.echo("Applying advanced feature engineering...")
             config = FeatureConfig()
@@ -120,10 +123,9 @@ def detect(input, output, contamination, visualization, method, export_anomalies
             features_df = pipeline.fit_transform(df)
             click.echo(f"Generated {len(pipeline.get_feature_names())} features")
         else:
-            features_df = df
-        
-        # Initialize detector
-        detector = AnomalyDetector(contamination=contamination)
+            # Use detector's built-in feature preparation
+            click.echo("Preparing features for anomaly detection...")
+            features_df = detector.prepare_features(df)
         
         # Run analysis
         click.echo("Running anomaly detection analysis...")

@@ -246,7 +246,7 @@ class AnomalyInjector:
         
         # Find a base transaction to modify
         base_idx = random.randint(0, len(df) - 5)
-        base_timestamp = df.loc[base_idx, 'timestamp']
+        base_timestamp = df.loc[base_idx, 'transaction_date']
         base_card = df.loc[base_idx, 'card_id'] if 'card_id' in df.columns else None
         
         # Create 3-5 small transactions within 10 minutes
@@ -263,7 +263,7 @@ class AnomalyInjector:
                 
                 # Adjust timestamp
                 new_timestamp = base_timestamp + timedelta(minutes=i * 2)
-                df.loc[idx, 'timestamp'] = new_timestamp
+                df.loc[idx, 'transaction_date'] = new_timestamp
         
         return df
     
@@ -281,7 +281,7 @@ class AnomalyInjector:
         
         # Find a base transaction
         base_idx = random.randint(0, len(df) - 4)
-        base_timestamp = df.loc[base_idx, 'timestamp']
+        base_timestamp = df.loc[base_idx, 'transaction_date']
         
         # Create transactions in different locations within hours
         for i, location in enumerate(locations[:min(4, len(df) - base_idx)]):
@@ -295,7 +295,7 @@ class AnomalyInjector:
                 
                 # Transactions happen within 2 hours (impossible travel)
                 new_timestamp = base_timestamp + timedelta(hours=i * 2)
-                df.loc[idx, 'timestamp'] = new_timestamp
+                df.loc[idx, 'transaction_date'] = new_timestamp
         
         return df
     
@@ -308,7 +308,7 @@ class AnomalyInjector:
         
         # Find a base transaction
         base_idx = random.randint(0, len(df) - 4)
-        base_timestamp = df.loc[base_idx, 'timestamp']
+        base_timestamp = df.loc[base_idx, 'transaction_date']
         
         # Create transactions just under common limits
         for i, amount in enumerate(limit_amounts[:min(4, len(df) - base_idx)]):
@@ -321,7 +321,7 @@ class AnomalyInjector:
                 
                 # Spread over 30 minute intervals
                 new_timestamp = base_timestamp + timedelta(minutes=i * 30)
-                df.loc[idx, 'timestamp'] = new_timestamp
+                df.loc[idx, 'transaction_date'] = new_timestamp
         
         return df
     

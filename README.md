@@ -4,7 +4,7 @@ A comprehensive machine learning system for detecting anomalous credit card tran
 
 [![Python 3.9+](https://img.shields.io/badge/python-3.9+-blue.svg)](https://www.python.org/downloads/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![Tests](https://img.shields.io/badge/tests-passing-green.svg)](#testing)
+[![Tests](https://img.shields.io/badge/tests-passing-green.svg)](#-testing)
 
 ## 🚀 Features
 
@@ -56,12 +56,6 @@ A comprehensive machine learning system for detecting anomalous credit card tran
 ├── data/                         # 📊 Generated data & results
 ├── tests/                        # 🧪 Test suite
 └── archive/                      # 📁 Old scripts (archived)
-├── generation/        # Transaction generation
-└── utils/            # Utility functions
-
-tests/
-├── unit/             # Unit tests for all components
-└── integration/      # End-to-end integration tests
 ```
 
 ### Key Components
@@ -107,7 +101,7 @@ python3 anomaly_detection.py generate --help
 
 ### Available Commands
 
-#### `generate` - Create synthetic transaction data
+#### \`generate\` - Create synthetic transaction data
 ```bash
 python3 anomaly_detection.py generate \
     --count 10000 \
@@ -117,7 +111,7 @@ python3 anomaly_detection.py generate \
     --cards 500
 ```
 
-#### `detect` - Analyze existing data for anomalies  
+#### \`detect\` - Analyze existing data for anomalies  
 ```bash
 python3 anomaly_detection.py detect \
     --input data/transactions.csv \
@@ -128,7 +122,7 @@ python3 anomaly_detection.py detect \
     --visualization data/anomaly_plot.png
 ```
 
-#### `pipeline` - End-to-end analysis
+#### \`pipeline\` - End-to-end analysis
 ```bash
 python3 anomaly_detection.py pipeline \
     --count 50000 \
@@ -166,225 +160,23 @@ features = pipeline.fit_transform(df)
 
 The system supports multiple detection algorithms:
 
-- **`ensemble`** (recommended): Combines multiple algorithms for best performance
-- **`isolation_forest`**: Fast, good for large datasets
-- **`pca`**: Principal component analysis for outlier detection
-- **`lof`**: Local outlier factor for density-based detection
-- **`dbscan`**: Clustering-based anomaly detection
-
-## 🧪 Testing
-
-### Run All Tests
-```bash
-# Run complete test suite
-pytest tests/ -v
-
-# Run with coverage
-pytest tests/ --cov=src --cov-report=html
-
-# Run specific test categories
-pytest tests/unit/ -v        # Unit tests only
-pytest tests/integration/ -v # Integration tests only
-```
-
-### Test Categories
-
-#### Unit Tests
-- **Model Validation**: Data model integrity and validation
-- **Configuration Management**: Config loading and validation
-- **Feature Engineering**: Individual feature engineer components
-- **Algorithm Components**: Individual detection algorithm testing
-
-#### Integration Tests
-- **End-to-End Pipeline**: Complete detection pipeline testing
-- **Large Dataset Handling**: Performance with realistic data volumes
-- **Configuration Integration**: Multi-component configuration testing
-
-## 📈 Performance Benchmarks
-
-### Detection Performance (1M Transactions)
-| Metric | Value | Notes |
-|--------|-------|-------|
-| **Processing Time** | ~45 seconds | Including feature engineering |
-| **Memory Usage** | ~2.5 GB peak | Optimized for large datasets |
-| **Accuracy** | 71.5% overall | Across all anomaly types |
-| **Precision** | 85.3% average | Minimal false positives |
-| **Recall** | 64.2% average | Good anomaly detection rate |
-
-### Algorithm Comparison
-| Algorithm | Precision | Recall | F1-Score | Speed |
-|-----------|-----------|--------|----------|-------|
-| **Ensemble** | **85.3%** | **64.2%** | **73.1%** | Medium |
-| Isolation Forest | 82.1% | 58.9% | 68.5% | Fast |
-| Local Outlier Factor | 79.8% | 62.1% | 69.8% | Slow |
-| PCA Reconstruction | 88.2% | 52.3% | 65.6% | Fast |
-
-## 🔧 Configuration Reference
-
-### System Configuration Structure
-```python
-@dataclass
-class SystemConfig:
-    generation: GenerationConfig    # Transaction generation settings
-    detection: DetectionConfig      # Detection algorithm configuration  
-    features: FeatureConfig        # Feature engineering parameters
-    output: OutputConfig           # Output and reporting settings
-```
-
-### Environment Variables
-```bash
-# Optional environment configuration
-export ANOMALY_CONFIG_PATH="/path/to/config.yaml"
-export ANOMALY_LOG_LEVEL="INFO"
-export ANOMALY_ENABLE_GPU="false"
-```
-
-## 📁 Project Structure
-
-### Complete Repository Layout
-```
-Anomaly_detection_credit_card_sample_app/
-├── README.md                           # This comprehensive guide
-├── requirements.txt                    # Python dependencies
-├── setup.py                           # Package installation
-├── LICENSE                            # MIT License
-│
-├── app.py                             # 🆕 Complete application (recommended)
-├── main.py                            # CLI transaction generation
-├── enhanced_large_scale_analysis.py   # Advanced analysis pipeline
-├── debug_anomaly_features.py          # Feature debugging tools
-├── detect_anomalies.py               # Basic detection script
-├── example.py                         # Simple usage examples
-├── advanced_example.py               # Advanced usage examples
-│
-├── src/                              # Main source code
-│   ├── core/                         # Core system components
-│   ├── features/                     # Feature engineering
-│   ├── detection/                    # Detection algorithms
-│   ├── generation/                   # Transaction generation
-│   └── utils/                        # Utility functions
-│
-├── tests/                            # Comprehensive test suite
-│   ├── unit/                         # Unit tests
-│   └── integration/                  # Integration tests
-│
-├── data/                             # Generated data and results
-└── docs/                             # Documentation (extensible)
-```
-```
-Anomaly_detection_credit_card_sample_app/
-├── README.md                           # This comprehensive guide
-├── requirements.txt                    # Python dependencies
-├── setup.py                           # Package installation
-├── LICENSE                            # MIT License
-│
-├── main.py                            # Primary CLI interface
-├── enhanced_large_scale_analysis.py   # Advanced analysis pipeline
-├── debug_anomaly_features.py          # Feature debugging tools
-├── detect_anomalies.py               # Basic detection script
-├── example.py                         # Simple usage examples
-├── advanced_example.py               # Advanced usage examples
-│
-├── src/                              # Main source code
-│   ├── core/                         # Core system components
-│   ├── features/                     # Feature engineering
-│   ├── detection/                    # Detection algorithms
-│   ├── generation/                   # Transaction generation
-│   └── utils/                        # Utility functions
-│
-├── tests/                            # 🆕 Comprehensive test suite
-│   ├── __init__.py
-│   ├── test_transaction_generator.py # Legacy generator tests
-│   │
-│   ├── unit/                         # Unit tests
-│   │   ├── test_config.py           # Configuration system tests
-│   │   ├── test_feature_engineering.py # Feature pipeline tests
-│   │   └── test_models.py           # Data model tests
-│   │
-│   └── integration/                  # Integration tests
-│       └── test_pipeline.py         # End-to-end pipeline tests
-│
-├── data/                             # Generated data and results
-│   ├── sample_transactions.csv       # Sample transaction data
-│   ├── detected_anomalies.csv       # Detection results
-│   ├── anomaly_detection_report.txt  # Analysis reports
-│   └── anomaly_visualization.png     # Result visualizations
-│
-├── docs/                             # Documentation (extensible)
-└── examples/                         # Usage examples (extensible)
-```
-
-### Legacy vs. New Architecture
-
-#### 🔄 Maintained Legacy Components
-- **Backward Compatibility**: All existing scripts continue to work
-- **Gradual Migration**: Legacy components marked for future refactoring
-- **No Breaking Changes**: Existing functionality preserved
-
-#### 🆕 New Modular Components
-- **Enhanced Performance**: Optimized for large-scale processing
-- **Better Testing**: Comprehensive unit and integration tests
-- **Configuration-Driven**: Flexible YAML/JSON configuration
-- **Type Safety**: Full type hints and dataclass models
-
-## 📚 API Reference
-
-### Basic Usage
-
-```python
-# Generate transactions with modular components
-from src.generation import TransactionGenerator
-
-generator = TransactionGenerator(seed=42)
-transactions = generator.generate_transactions(
-    count=100000,
-    anomaly_rate=0.002
-)
-
-# Use with existing detection systems
-# Run with: python enhanced_large_scale_analysis.py
-```
-
-### Configuration
-
-The system supports both legacy configuration files and the new modular configuration system for enhanced flexibility.
-
-## 🤝 Contributing
-
-### Development Setup
-
-1. **Clone and setup**:
-   ```bash
-   git clone <repository-url>
-   cd Anomaly_detection_credit_card_sample_app
-   pip install -r requirements.txt
-   ```
-
-2. **Run tests**:
-   ```bash
-   pytest tests/ -v --cov=src
-   ```
-
-### Adding New Features
-
-The modular architecture makes it easy to extend the system:
-- **New Anomaly Types**: Add to core models and detection logic
-- **New Algorithms**: Implement in detection module  
-- **New Features**: Extend feature engineering pipeline
-
----
+- **\`ensemble\`** (recommended): Combines multiple algorithms for best performance
+- **\`isolation_forest\`**: Fast, good for large datasets
+- **\`pca\`**: Principal component analysis for outlier detection
+- **\`lof\`**: Local outlier factor for density-based detection
+- **\`dbscan\`**: Clustering-based anomaly detection
 
 ## ✅ **CLEAN ARCHITECTURE COMPLETED!**
 
 ### 🎯 **What We Accomplished**
 
-✅ **Consolidated Structure**: All Python logic moved from scattered root files into organized `src/` package  
-✅ **Single Entry Point**: Clean `anomaly_detection.py` provides unified CLI interface  
-✅ **Archived Legacy**: Old scattered scripts moved to `archive/old_scripts/`  
+✅ **Consolidated Structure**: All Python logic moved from scattered root files into organized \`src/\` package  
+✅ **Single Entry Point**: Clean \`anomaly_detection.py\` provides unified CLI interface  
+✅ **Archived Legacy**: Old scattered scripts moved to \`archive/old_scripts/\`  
 ✅ **Working Pipeline**: Complete generate → detect → report workflow functional  
 ✅ **Modular Backend**: Advanced features still available while maintaining simplicity  
 
-### � **Ready to Use**
+### 🚀 **Ready to Use**
 
 ```bash
 # Complete pipeline - generates data and detects anomalies
@@ -399,7 +191,7 @@ Your codebase is now **clean, organized, and fully functional**! 🎉
 
 ---
 
-## �📄 License
+## 📄 License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 

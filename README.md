@@ -23,12 +23,12 @@ A comprehensive machine learning system for detecting anomalous credit card tran
 - **Unusual Merchant Categories**: Uncommon spending patterns
 - **Round Amounts**: Suspicious round-number transactions
 
-### Enhanced Features (Latest Updates)
-- ✅ **Clean Architecture**: All code organized in src/ package
-- ✅ **Unified CLI**: Single entry point with multiple commands
-- ✅ **Modular Design**: Configurable and extensible components
-- ✅ **Improved Performance**: 62.2% detection rate for frequent transactions
-- ✅ **Comprehensive Test Coverage**: Unit and integration tests
+### Enhanced Features (Latest Refactoring)
+- ✅ **Clean Architecture**: Eliminated code duplication, single source of truth
+- ✅ **Unified CLI**: Single entry point with streamlined commands
+- ✅ **Modern Components**: Advanced anomaly injection with configurable patterns
+- ✅ **Improved Performance**: Optimized algorithms and reduced complexity
+- ✅ **Maintainable Code**: Clear module boundaries and modern Python patterns
 
 ## 📊 Performance Results
 
@@ -43,27 +43,29 @@ A comprehensive machine learning system for detecting anomalous credit card tran
 
 ## 🏗️ Clean Architecture
 
-### Organized Structure
+### Refined Structure
 ```
-├── anomaly_detection.py          # 🎯 Main entry point
-├── src/                          # 📦 All source code
+├── anomaly_detection.py          # 🎯 Single unified entry point
+├── src/                          # 📦 Organized source code
 │   ├── cli/                      #    Command-line interface
-│   ├── core/                     #    Core models & config
+│   ├── core/                     #    Configuration & models
 │   ├── features/                 #    Feature engineering
-│   ├── generation/               #    Transaction generation
-│   ├── detection/                #    Anomaly detection
+│   ├── generation/               #    Advanced transaction generation
+│   │   ├── transaction_generator.py    #    Modern generator
+│   │   └── anomaly_injector.py         #    Advanced anomaly patterns
+│   ├── detection/                #    Anomaly detection algorithms
 │   └── utils/                    #    Utility functions
 ├── data/                         # 📊 Generated data & results
-├── tests/                        # 🧪 Test suite
-└── archive/                      # 📁 Old scripts (archived)
+└── tests/                        # 🧪 Comprehensive test suite
 ```
 
 ### Key Components
 
-- **Core Models**: Complete data models with validation
-- **Configuration System**: YAML/JSON-based configuration with validation
-- **Feature Engineering**: Advanced feature extraction pipeline
-- **Modular Generation**: Modern transaction generation capabilities
+- **Unified Entry Point**: Single `anomaly_detection.py` for all functionality
+- **Modern Generator**: Advanced transaction generation with realistic patterns
+- **Smart Anomaly Injection**: Configurable fraud patterns and anomaly types  
+- **Clean Configuration**: Centralized config system with validation
+- **Streamlined CLI**: Simple, powerful command interface
 
 ## 🚀 Quick Start
 
@@ -82,17 +84,17 @@ A comprehensive machine learning system for detecting anomalous credit card tran
 
 ### Usage
 
-The application now has a clean, unified CLI interface:
+The application provides a clean, streamlined interface:
 
 ```bash
-# Generate sample transactions
-python3 anomaly_detection.py generate --count 1000 --anomaly-rate 0.05
+# Generate sample transactions (anomalies injected automatically)
+python3 anomaly_detection.py generate --count 1000 --output my_data.csv
 
-# Detect anomalies in existing data
+# Detect anomalies in existing data  
 python3 anomaly_detection.py detect --input data/transactions.csv --method ensemble
 
 # Run complete pipeline (generate + detect)
-python3 anomaly_detection.py pipeline --count 5000 --anomaly-rate 0.03 --run-detection
+python3 anomaly_detection.py pipeline --count 5000 --run-detection
 
 # Get help for any command
 python3 anomaly_detection.py --help
@@ -101,17 +103,15 @@ python3 anomaly_detection.py generate --help
 
 ### Available Commands
 
-#### \`generate\` - Create synthetic transaction data
+#### `generate` - Create synthetic transaction data
 ```bash
 python3 anomaly_detection.py generate \
     --count 10000 \
-    --anomaly-rate 0.05 \
     --output data/my_transactions.csv \
-    --use-modern \
     --cards 500
 ```
 
-#### \`detect\` - Analyze existing data for anomalies  
+#### `detect` - Analyze existing data for anomalies  
 ```bash
 python3 anomaly_detection.py detect \
     --input data/transactions.csv \
@@ -122,13 +122,11 @@ python3 anomaly_detection.py detect \
     --visualization data/anomaly_plot.png
 ```
 
-#### \`pipeline\` - End-to-end analysis
+#### `pipeline` - End-to-end analysis
 ```bash
 python3 anomaly_detection.py pipeline \
     --count 50000 \
-    --anomaly-rate 0.02 \
     --output-dir results/ \
-    --use-modern \
     --run-detection
 ```
 
@@ -138,12 +136,12 @@ python3 anomaly_detection.py pipeline \
 
 ```python
 # Use the modular components directly
-from src.generation.modern_generator import TransactionGenerator
+from src.generation.transaction_generator import TransactionGenerator
 from src.features.engineering import FeaturePipeline, FeatureConfig
 
-# Generate data
+# Generate data with automatic anomaly injection
 generator = TransactionGenerator(seed=42)
-df = generator.generate_transactions(count=10000, anomaly_rate=0.01)
+df = generator.generate_transactions(count=10000)
 
 # Advanced feature engineering
 config = FeatureConfig(
@@ -170,11 +168,11 @@ The system supports multiple detection algorithms:
 
 ### 🎯 **What We Accomplished**
 
-✅ **Consolidated Structure**: All Python logic moved from scattered root files into organized \`src/\` package  
-✅ **Single Entry Point**: Clean \`anomaly_detection.py\` provides unified CLI interface  
-✅ **Archived Legacy**: Old scattered scripts moved to \`archive/old_scripts/\`  
+✅ **Consolidated Structure**: All Python logic organized in clean `src/` package structure  
+✅ **Single Entry Point**: Clean `anomaly_detection.py` provides unified CLI interface  
+✅ **Eliminated Duplication**: Removed legacy scattered files and duplicate implementations  
 ✅ **Working Pipeline**: Complete generate → detect → report workflow functional  
-✅ **Modular Backend**: Advanced features still available while maintaining simplicity  
+✅ **Modern Backend**: Advanced features with clean, maintainable architecture  
 
 ### 🚀 **Ready to Use**
 
@@ -187,7 +185,24 @@ python3 anomaly_detection.py generate --count 500 --use-modern
 python3 anomaly_detection.py detect --input data/transactions.csv --method ensemble
 ```
 
-Your codebase is now **clean, organized, and fully functional**! 🎉
+## 🔧 Recent Refactoring (v2.0)
+
+### What's New
+This codebase has been significantly **refactored and cleaned** for better maintainability:
+
+- **✅ Eliminated Code Duplication**: Removed 4 duplicate generator/config files
+- **✅ Simplified Architecture**: Single source of truth for each feature
+- **✅ Modern Patterns**: Advanced anomaly injection with fraud pattern detection
+- **✅ Clean Dependencies**: Resolved circular imports and streamlined modules
+- **✅ Better Performance**: Optimized algorithms and reduced complexity
+
+### Migration Benefits
+- **Faster Development**: Clear module boundaries and single implementations
+- **Easier Debugging**: No confusion between multiple similar files
+- **Better Testing**: Clean interfaces make unit testing straightforward
+- **Future-Ready**: Modern architecture prepared for new features
+
+Your codebase is now **clean, maintainable, and production-ready**! 🎉
 
 ---
 

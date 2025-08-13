@@ -98,6 +98,8 @@ class AnomalyInjector:
         # Initialize anomaly columns if they don't exist
         if 'is_anomaly' not in df.columns:
             df['is_anomaly'] = False
+        if 'is_fraud' not in df.columns:
+            df['is_fraud'] = False
         if 'anomaly_type' not in df.columns:
             df['anomaly_type'] = None
         

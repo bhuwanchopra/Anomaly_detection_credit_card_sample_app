@@ -11,9 +11,7 @@ from datetime import datetime, timedelta
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', 'src'))
 
 # Import the modules we need for testing  
-import transaction_generator
-import data_models
-from transaction_generator import TransactionGenerator
+from generation.transaction_generator import TransactionGenerator
 from data_models import CreditCard
 
 

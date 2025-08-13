@@ -11,9 +11,8 @@ import os
 from datetime import datetime, timedelta
 
 # Import our modules
-from ..transaction_generator import TransactionGenerator
+from ..generation.transaction_generator import TransactionGenerator
 from ..anomaly_detector import AnomalyDetector
-from ..generation.modern_generator import TransactionGenerator as ModernGenerator
 from ..features.engineering import FeaturePipeline
 from ..core.config import FeatureConfig
 
@@ -62,23 +61,13 @@ def generate(count, output, anomaly_rate, start_date, end_date, output_format, c
     # Generate transactions
     click.echo(f"Generating {count} transactions...")
     
-    if use_modern:
-        generator = ModernGenerator(seed=42)
-        transactions_df = generator.generate_transactions(
-            count=count,
-            start_date=start_date,
-            end_date=end_date,
-            anomaly_rate=anomaly_rate,
-            num_cards=cards
-        )
-    else:
-        generator = TransactionGenerator()
-        transactions_df = generator.generate_transactions(
-            count=count,
-            start_date=start_date,
-            end_date=end_date,
-            anomaly_rate=anomaly_rate
-        )
+    generator = TransactionGenerator(seed=42)
+    transactions_df = generator.generate_transactions(
+        count=count,
+        start_date=start_date,
+        end_date=end_date,
+        num_cards=cards
+    )
     
     # Save output
     if output_format == 'csv':
@@ -207,19 +196,11 @@ def pipeline(count, anomaly_rate, output_dir, cards, use_modern, run_detection):
     
     transactions_file = output_dir / "generated_transactions.csv"
     
-    if use_modern:
-        generator = ModernGenerator(seed=42)
-        transactions_df = generator.generate_transactions(
-            count=count,
-            anomaly_rate=anomaly_rate,
-            num_cards=cards
-        )
-    else:
-        generator = TransactionGenerator()
-        transactions_df = generator.generate_transactions(
-            count=count,
-            anomaly_rate=anomaly_rate
-        )
+    generator = TransactionGenerator(seed=42)
+    transactions_df = generator.generate_transactions(
+        count=count,
+        num_cards=cards
+    )
     
     transactions_df.to_csv(transactions_file, index=False)
     click.echo(f"Generated {len(transactions_df)} transactions saved to {transactions_file}")

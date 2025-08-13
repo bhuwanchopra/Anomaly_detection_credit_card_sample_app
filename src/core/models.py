@@ -40,8 +40,8 @@ class CreditCard:
     
     def __post_init__(self):
         """Validate credit card data."""
-        if len(self.number) != 16:
-            raise ValueError("Credit card number must be 16 digits")
+        if len(self.number) not in [15, 16]:  # Support Amex (15) and Visa/MC/Discover (16)
+            raise ValueError("Credit card number must be 15 or 16 digits")
         if not (1 <= self.expiry_month <= 12):
             raise ValueError("Expiry month must be between 1 and 12")
         if len(self.cvv) != 3:
